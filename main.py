@@ -103,9 +103,8 @@ async def main(db1: DBWorker1, db2: DBWorker2):
                 logger.info(f"Start uploading attempts for user {user_id}")
 
                 for n, attempt in enumerate(user_attempts.values()):
-                    logger.info(f"Uploading attempt {n} user {user_id}")
+                    logger.info(f"Uploading attempt {n} user {user_id} answer count {len(attempt['answers'])}")
                     if not attempt['answers']:
-                        logger.info(f"Answers for this attempt was empty")
                         break
 
                     attempt_start_time = datetime.fromtimestamp(attempt['start_time'])
@@ -133,7 +132,7 @@ async def main(db1: DBWorker1, db2: DBWorker2):
 
         PAGE += 1
 
-
+logger.add("file.log", encoding="utf8")
 db1: DBWorker1 = DBWorker1()
 loop = asyncio.get_event_loop()
 loop.run_until_complete(db1.connect())
