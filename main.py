@@ -131,6 +131,8 @@ async def main(db1: DBWorker1, db2: DBWorker2):
         except Exception:
             logger.opt(exception=True).debug("Exception logged with debug level:")
 
+        PAGE += 1
+
 
 db1: DBWorker1 = DBWorker1()
 loop = asyncio.get_event_loop()
