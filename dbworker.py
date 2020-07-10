@@ -23,12 +23,13 @@ class DBWorker1:
             database=old_postgres_database,
             host=old_postgres_ip,
         )
-    async def get_results(self):
-        result = await self.conn.fetch(get_test_results_from_old_db)
-        logger.info(result)
-        if len(result)>0:
+    async def get_results(self, page = 1, per_page = 100):
+        result = await self.conn.fetch(get_test_results_from_old_db, per_page, (page - 1) * per_page)
+
+        if len(result) > 0:
             return result
-        return False
+
+        return []
 
 class DBWorker2:
     async def connect(self, migrate: bool = False) -> None:
@@ -66,8 +67,8 @@ write_result = "insert into results(\"id\", \"user_id\", \"time\", \"right\", \"
 update_current_test_step = "update current_test set step=$3 WHERE id=$1 and user_id = $2"
 write_answer = "insert into user_answers(id, user_id, answer_id, question_id) values($1, $2, $3, $4)"
 set_current_test = "insert into current_test(\"user_id\", \"test_id\", \"step\", \"start_time\") values($1, $2, $3, $4) returning id"
-get_answers_by_step = "select a.id, a.is_right, a.question_id from test_questions tq join answers a on tq.question_id = a.question_id where tq.step=$1"
-get_test_results_from_old_db = "select * from results"
+get_answers_by_step = "select a.id, a.is_right, a.question_id, a.text, tq.step as step_id from test_questions tq join answers a on tq.question_id = a.question_id where tq.step=$1"
+get_test_results_from_old_db = "select * from results LIMIT $1 offset $2"
 get_results_from_old_db = "select * from results"
 set_user_to_new_db = "insert into users(id, name) values($1,$2) returning id"
 write_test_question = "insert into test_questions(test_id, question_id, step) values(1,$1,$2) returning id"
